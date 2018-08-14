@@ -1,0 +1,59 @@
+{
+    "status": {
+        "timestamp": "2018-08-14T10:18:21.778Z",
+        "error_code": 0,
+        "error_message": null,
+        "elapsed": 5,
+        "credit_count": 1
+    },
+    "data": {
+        "GBG": {
+            "id": 1542,
+            "name": "Golos Gold",
+            "symbol": "GBG",
+            "slug": "golos-gold",
+            "circulating_supply": null,
+            "total_supply": null,
+            "max_supply": null,
+            "date_added": "2017-02-13T00:00:00.000Z",
+            "num_market_pairs": 3,
+            "cmc_rank": 1694,
+            "last_updated": "2018-08-14T10:17:43.000Z",
+            "quote": {
+                "USD": {
+                    "price": 0.0324719168023,
+                    "volume_24h": 1764.18143662236,
+                    "percent_change_1h": 0.536504,
+                    "percent_change_24h": -13.9228,
+                    "percent_change_7d": -27.1909,
+                    "market_cap": 0,
+                    "last_updated": "2018-08-14T10:17:43.000Z"
+                }
+            }
+        },
+        "GOLOS": {
+            "id": 1480,
+            "name": "Golos",
+            "symbol": "GOLOS",
+            "slug": "golos",
+            "circulating_supply": 124518891.448,
+            "total_supply": 124518891.448,
+            "max_supply": null,
+            "date_added": "2016-12-12T00:00:00.000Z",
+            "num_market_pairs": 3,
+            "cmc_rank": 522,
+            "last_updated": "2018-08-14T10:17:43.000Z",
+            "quote": {
+                "USD": {
+                    "price": 0.0324110388458,
+                    "volume_24h": 8410.15549093936,
+                    "percent_change_1h": 0.682447,
+                    "percent_change_24h": -10.1656,
+                    "percent_change_7d": -36.6249,
+                    "market_cap": 4035786.6277570818,
+                    "last_updated": "2018-08-14T10:17:43.000Z"
+                }
+            }
+        }
+    }
+}

@@ -10,6 +10,8 @@ let db = null;
 async function run() {
     db = await connect();
 
+    await checkHistoricalDump(db);
+
     // safeParse();
     // setInterval(() => safeParse(), INTERVAL);
 
@@ -54,6 +56,28 @@ async function parse() {
     await actualCollection.insertOne(insertData);
 
     console.log('inserted', insertData);
+}
+
+async function checkHistoricalDump(db) {
+    const historicalCollection = db.collection('historical');
+
+    try {
+        const stats = await historicalCollection.stats();
+
+        if (stats.count > 0) {
+            return;
+        }
+    } catch(err) {}
+
+    console.log('Start historical data recovery');
+
+    const data = require('../data/historical-data.json');
+
+    for (let item of data) {
+        await historicalCollection.insertOne(item);
+    }
+
+    console.log('Historical data recovery complete');
 }
 
 run().catch(err => {

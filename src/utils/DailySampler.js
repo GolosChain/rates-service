@@ -82,6 +82,8 @@ class DailySampler {
                 upsert: true,
             }
         );
+
+        return true;
     }
 
     async _tryRecover() {
@@ -101,10 +103,16 @@ class DailySampler {
             });
 
             if (!data) {
+                let ok = false;
+
                 try {
-                    await this._makeSample(date);
+                    ok = await this._makeSample(date);
                 } catch (err) {
                     console.error('Recovery failed', err);
+                }
+
+                if (!ok) {
+                    console.error('Missed rates for:', date);
                 }
             }
         }
