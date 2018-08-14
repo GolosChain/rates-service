@@ -1,5 +1,4 @@
 const moment = require('moment-timezone');
-const { balancedAvg } = require('./helpers');
 
 class DailySampler {
     constructor(db) {
@@ -42,24 +41,14 @@ class DailySampler {
         const actualCollection = this._db.collection('actual');
         const historicalCollection = this._db.collection('historical');
 
-        const ratesList = await actualCollection.find({ date }, { rates: 1 }).toArray();
+        const lastValue = await actualCollection.findOne(
+            { date },
+            { sort: { date: -1 }, projection: { rates: 1 } }
+        );
 
-        if (!ratesList.length) {
+        if (!lastValue) {
             return;
         }
-
-        const aggregatesList = {
-            GOLOS: [],
-            GBG: [],
-        };
-
-        for (let { rates } of ratesList) {
-            aggregatesList.GOLOS.push(rates.GOLOS.USD);
-            aggregatesList.GBG.push(rates.GBG.USD);
-        }
-
-        const avgGolos = balancedAvg(aggregatesList.GOLOS);
-        const avgGbg = balancedAvg(aggregatesList.GBG);
 
         historicalCollection.updateOne(
             {
@@ -68,14 +57,7 @@ class DailySampler {
             {
                 $set: {
                     date,
-                    rates: {
-                        GOLOS: {
-                            USD: avgGolos,
-                        },
-                        GBG: {
-                            USD: avgGbg,
-                        },
-                    },
+                    rates: lastValue.rates,
                 },
             },
             {

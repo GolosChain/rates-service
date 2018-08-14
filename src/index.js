@@ -12,8 +12,8 @@ async function run() {
 
     await checkHistoricalDump(db);
 
-    // safeParse();
-    // setInterval(() => safeParse(), INTERVAL);
+    safeParse();
+    setInterval(() => safeParse(), INTERVAL);
 
     const sampler = new DailySampler(db);
     sampler.start();

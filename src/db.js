@@ -1,5 +1,5 @@
 const mongo = require('mongodb');
-const config = require('./utils/config');
+const env = require('./env');
 
 const DB_NAME = 'rates';
 
@@ -17,7 +17,7 @@ async function connect() {
 function _connect() {
     return new Promise((resolve, reject) => {
         mongo.connect(
-            config.get('MONGODB_CONNECTION_STRING'),
+            env.GLS_MONGO_CONNECT,
             { useNewUrlParser: true },
             (err, client) => {
                 if (err) {

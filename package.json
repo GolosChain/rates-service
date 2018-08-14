@@ -2,16 +2,16 @@
   "name": "rates-service",
   "version": "0.0.0",
   "description": "Rates aggregator service",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "src/index.js"
   },
   "keywords": [],
   "author": "golos.io",
-  "license": "ISC",
+  "license": "GPL-3.0",
   "dependencies": {
-    "config": "^2.0.1",
     "fs-extra": "^7.0.0",
+    "gls-core-service": "git+https://github.com/GolosChain/core-service.git",
     "lodash": "^4.17.10",
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.21",
