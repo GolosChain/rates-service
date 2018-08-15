@@ -21,7 +21,8 @@ class MongoDB extends BasicService {
     }
 
     async _ensureIndexes() {
-        await this.db.collection('actual').createIndex({ date: -1 });
+        await this.db.collection('actual').createIndex({ date: 1 });
+        await this.db.collection('actual').createIndex({ stamp: -1 });
         await this.db.collection('historical').createIndex({ date: -1 }, { unique: true });
     }
 

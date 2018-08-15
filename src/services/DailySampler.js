@@ -26,8 +26,6 @@ class DailySampler extends BasicService {
     }
 
     async restore() {
-        Logger.info('LOL WHATS');
-
         this._tryRecover().catch(err => {
             Logger.error('Recovery failed', err);
         });

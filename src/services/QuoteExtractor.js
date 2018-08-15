@@ -38,8 +38,6 @@ class QuoteExtractor extends BasicService {
     }
 
     async _parse() {
-        Logger.info('Parse run');
-
         const db = this.mongo.db;
 
         const data = await getQuotes();
@@ -66,8 +64,6 @@ class QuoteExtractor extends BasicService {
         };
 
         await actualCollection.insertOne(insertData);
-
-        console.log('inserted', insertData);
     }
 }
 

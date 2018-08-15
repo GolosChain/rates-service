@@ -1,23 +1,26 @@
 const core = require('gls-core-service');
-const stats = core.Stats.client;
-const BasicService = core.service.Basic;
-//const MongoDB = core.service.MongoDB;
-const { Logger } = core;
-const MongoDB = require('./services/MongoDB');
 const env = require('./env');
+const MongoDB = require('./services/MongoDB');
 const QuoteExtractor = require('./services/QuoteExtractor');
 const DailySampler = require('./services/DailySampler');
+const Api = require('./services/Api');
 
-class Main extends BasicService {
+const stats = core.Stats.client;
+const { Basic, Gate } = core.service;
+//const MongoDB = core.service.MongoDB;
+const { Logger } = core;
+
+class Main extends Basic {
     constructor() {
         super();
 
         this.mongo = new MongoDB();
+        const api = new Api(Gate, this.mongo);
         const quoteExtractor = new QuoteExtractor(this.mongo);
         const dailySampler = new DailySampler(this.mongo);
 
         this.printEnvBasedConfig(env);
-        this.addNested(this.mongo, quoteExtractor, dailySampler);
+        this.addNested(this.mongo, api, quoteExtractor, dailySampler);
         this.stopOnExit();
     }
 
