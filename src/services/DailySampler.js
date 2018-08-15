@@ -3,7 +3,6 @@ const moment = require('moment-timezone');
 
 const { Moments, Logger } = core;
 
-const stats = core.Stats.client;
 const BasicService = core.service.Basic;
 
 class DailySampler extends BasicService {

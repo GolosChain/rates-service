@@ -9,6 +9,10 @@
   "keywords": [],
   "author": "golos.io",
   "license": "GPL-3.0",
+  "repository": {
+    "author": "GolosChain",
+    "url": "https://github.com/GolosChain/rates-service"
+  },
   "dependencies": {
     "fs-extra": "^7.0.0",
     "gls-core-service": "git+https://github.com/GolosChain/core-service.git",

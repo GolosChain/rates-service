@@ -2,8 +2,6 @@ const core = require('gls-core-service');
 const mongodb = require('mongodb');
 const env = require('../env');
 
-const { Logger } = core;
-
 const BasicService = core.service.Basic;
 
 const DB_NAME = 'rates';

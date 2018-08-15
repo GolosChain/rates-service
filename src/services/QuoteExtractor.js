@@ -8,7 +8,6 @@ const { Moments, Logger } = core;
 const BasicService = core.service.Basic;
 
 class QuoteExtractor extends BasicService {
-
     constructor(mongo) {
         super();
         this.mongo = mongo;
@@ -28,13 +27,15 @@ class QuoteExtractor extends BasicService {
     async iteration() {
         Logger.info('QuoteExtractor iteration started');
 
-        this._safeParse();
+        await this._safeParse();
     }
 
-    _safeParse() {
-        this._parse().catch(err => {
+    async _safeParse() {
+        try {
+            await this._parse();
+        } catch (err) {
             Logger.error('Safe parse error:', err);
-        });
+        }
     }
 
     async _parse() {
@@ -42,8 +43,8 @@ class QuoteExtractor extends BasicService {
 
         const data = await getQuotes();
 
-        const gbgPrice = _.get(data, 'data.GBG.quote.USD.price');
-        const golosPrice = _.get(data, 'data.GOLOS.quote.USD.price');
+        const gbgPrice = data.GBG.quote.USD.price;
+        const golosPrice = data.GOLOS.quote.USD.price;
 
         const actualCollection = db.collection('actual');
 

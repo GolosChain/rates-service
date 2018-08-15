@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   mongo:
-    container_name: mongo
+    container_name: rates_mongo
     image: mongo:4
     restart: always
     volumes:
@@ -9,10 +9,10 @@ services:
     ports:
     - 127.0.0.1:27017:27017
     networks:
-    - services-tier
+    - rates_services-tier
 
   node:
-    container_name: node
+    container_name: rates_node
     restart: always
     depends_on:
     - mongo
@@ -20,10 +20,9 @@ services:
       context: .
       dockerfile: Dockerfile
     networks:
-    - services-tier
+    - rates_services-tier
     ports:
     - $GLS_GATE_HOST:$GLS_GATE_PORT:$GLS_GATE_PORT
-    - $GLS_METRICS_HOST:$GLS_METRICS_PORT:$GLS_METRICS_PORT
     environment:
     - GLS_DAY_START
     - GLS_MONGO_CONNECT
@@ -36,5 +35,4 @@ volumes:
   mongodb_vol:
 
 networks:
-  services-tier:
-
+  rates_services-tier:
