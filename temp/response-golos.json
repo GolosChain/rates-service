@@ -1,1 +1,0 @@
-400 - "{\n    \"status\": {\n        \"timestamp\": \"2018-08-14T10:12:07.323Z\",\n        \"error_code\": 400,\n        \"error_message\": \"\\\"symbol\\\" is not allowed\",\n        \"elapsed\": 0,\n        \"credit_count\": 0\n    }\n}"
