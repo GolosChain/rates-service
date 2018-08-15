@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const core = require('gls-core-service');
 const moment = require('moment-timezone');
 const { getQuotes } = require('../utils/api');

@@ -1,5 +1,4 @@
 const core = require('gls-core-service');
-const _ = require('lodash');
 const errors = core.HttpError;
 const BasicService = core.service.Basic;
 const stats = core.Stats.client;
@@ -11,7 +10,8 @@ class Api extends BasicService {
         this.mongo = mongo;
         this._gate = new Gate();
 
-        _.bindAll(this, ['_getActual', '_getHistorical']);
+        this._getActual = this._getActual.bind(this);
+        this._getHistorical = this._getHistorical.bind(this);
     }
 
     async start() {
