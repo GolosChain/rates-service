@@ -6,8 +6,6 @@ services:
     restart: always
     volumes:
     - mongodb_vol:/data/db
-    ports:
-    - 127.0.0.1:27017:27017
     networks:
     - rates_services-tier
 
@@ -32,6 +30,7 @@ services:
     - GLS_GATE_PORT
     - GLS_COIN_MARKET_API_ENDPOINT
     - GLS_COIN_MARKET_API_KEY
+    - GLS_FETCH_INTERVAL
 
 volumes:
   mongodb_vol:

@@ -1,10 +1,13 @@
 const core = require('gls-core-service');
 const moment = require('moment-timezone');
 const { getQuotes } = require('../utils/api');
+const env = require('../env');
 
-const { Moments, Logger } = core;
+const { Logger } = core;
 
 const BasicService = core.service.Basic;
+
+const CURRENCIES = ['USD', 'EUR', 'RUB'];
 
 class QuoteExtractor extends BasicService {
     constructor(mongo) {
@@ -20,12 +23,10 @@ class QuoteExtractor extends BasicService {
         newDay.millisecond(0);
         newDay.add(1, 'day');
 
-        this.startLoop(0, 5 * Moments.oneMinute);
+        this.startLoop(0, env.GLS_FETCH_INTERVAL * 1000);
     }
 
     async iteration() {
-        Logger.info('QuoteExtractor iteration started');
-
         await this._safeParse();
     }
 
@@ -40,10 +41,7 @@ class QuoteExtractor extends BasicService {
     async _parse() {
         const db = this.mongo.db;
 
-        const result = await getQuotes();
-
-        const gbgPrice = result.data.GBG.quote.USD.price;
-        const golosPrice = result.data.GOLOS.quote.USD.price;
+        const result = await getQuotes(CURRENCIES);
 
         const actualCollection = db.collection('actual');
 
@@ -52,12 +50,8 @@ class QuoteExtractor extends BasicService {
 
         const insertData = {
             rates: {
-                GBG: {
-                    USD: gbgPrice,
-                },
-                GOLOS: {
-                    USD: golosPrice,
-                },
+                GBG: extractQuote(result.data.GBG.quote),
+                GOLOS: extractQuote(result.data.GOLOS.quote),
             },
             date,
             stamp: new Date(),
@@ -65,6 +59,14 @@ class QuoteExtractor extends BasicService {
 
         await actualCollection.insertOne(insertData);
     }
+}
+
+function extractQuote(quotes) {
+    return {
+        USD: quotes.USD.price,
+        EUR: quotes.EUR.price,
+        RUB: quotes.RUB.price,
+    };
 }
 
 module.exports = QuoteExtractor;

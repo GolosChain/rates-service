@@ -19,6 +19,7 @@ class Api extends BasicService {
             serverRoutes: {
                 getActual: this._getActual,
                 getHistorical: this._getHistorical,
+                getHistoricalMulti: this._getHistoricalMulti,
             },
         });
 
@@ -110,6 +111,12 @@ class Api extends BasicService {
         return {
             date,
             rates: data.rates,
+        };
+    }
+
+    _getHistoricalMulti({ dates }) {
+        return {
+            items: dates.map(date => this._getHistorical({ date })),
         };
     }
 }

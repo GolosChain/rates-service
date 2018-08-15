@@ -1,8 +1,8 @@
 const request = require('request-promise-native');
 const env = require('../env');
 
-function getQuotes() {
-    const apiName = 'cryptocurrency/quotes/latest?symbol=GOLOS,GBG&convert=USD';
+function getQuotes(currencies) {
+    const apiName = `cryptocurrency/quotes/latest?symbol=GOLOS,GBG&convert=${currencies.join(',')}`;
     return callApi(apiName);
 }
 
@@ -11,11 +11,8 @@ function callApi(apiName) {
     const apiKey = env.GLS_COIN_MARKET_API_KEY;
 
     return request({
-        //url: 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?start=1&limit=200&convert=RUB',
-        //url: 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?start=1&limit=100&symbol=GOLOS,GBG&convert=RUB',
         url: `${host}${apiName}`,
         json: true,
-        //url: 'https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest?convert=USD',
         headers: {
             'X-CMC_PRO_API_KEY': apiKey,
         },
