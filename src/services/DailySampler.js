@@ -1,45 +1,56 @@
+const core = require('gls-core-service');
 const moment = require('moment-timezone');
 
-class DailySampler {
-    constructor(db) {
-        this._db = db;
+const { Moments, Logger } = core;
+
+const stats = core.Stats.client;
+const BasicService = core.service.Basic;
+
+class DailySampler extends BasicService {
+    constructor(mongo) {
+        super();
+        this.mongo = mongo;
     }
 
-    start() {
-        this._scheduleNextRun();
+    async start() {
+        await this.restore();
 
-        this._tryRecover().catch(err => {
-            console.error('recover failed', err);
-        });
-    }
-
-    _scheduleNextRun() {
-        const now = moment.tz('UTC');
-
-        const newDay = now.clone();
+        const newDay = moment.tz('UTC');
         newDay.hour(0);
         newDay.minute(0);
         newDay.second(0);
         newDay.millisecond(0);
         newDay.add(1, 'day');
 
-        const date = now.format('YYYY-MM-DD');
+        this.startLoop(newDay - Date.now() + 30000, Moments.oneDay);
+    }
 
-        setTimeout(async () => {
-            this._scheduleNextRun();
+    async restore() {
+        Logger.info('LOL WHATS');
 
-            try {
-                await this._makeSample(date);
-                await this._cleanActualBefore(date);
-            } catch (err) {
-                console.error('DailySampler failed:', err);
-            }
-        }, newDay - Date.now() + 1000);
+        this._tryRecover().catch(err => {
+            Logger.error('Recovery failed', err);
+        });
+    }
+
+    async iteration() {
+        Logger.info('DailySampler iteration started');
+
+        const date = moment.tz('UTC').format('YYYY-MM-DD');
+
+        try {
+            await this._makeSample(date);
+            await this._cleanActualBefore(date);
+        } catch (err) {
+            console.error('DailySampler failed:', err);
+        }
     }
 
     async _makeSample(date) {
-        const actualCollection = this._db.collection('actual');
-        const historicalCollection = this._db.collection('historical');
+        const db = this.mongo.db;
+
+        const actualCollection = db.collection('actual');
+        const historicalCollection = db.collection('historical');
 
         const lastValue = await actualCollection.findOne(
             { date },
@@ -68,7 +79,19 @@ class DailySampler {
         return true;
     }
 
+    async _cleanActualBefore(date) {
+        const actualCollection = this.mongo.db.collection('actual');
+
+        await actualCollection.deleteMany({
+            date: {
+                $lte: date,
+            },
+        });
+    }
+
     async _tryRecover() {
+        const db = this.mongo.db;
+
         const yesterday = moment();
         yesterday.hour(12);
         yesterday.subtract(1, 'day');
@@ -78,7 +101,7 @@ class DailySampler {
 
             const date = day.format('YYYY-MM-DD');
 
-            const historicalCollection = this._db.collection('historical');
+            const historicalCollection = db.collection('historical');
 
             const data = await historicalCollection.findOne({
                 date,
@@ -100,16 +123,6 @@ class DailySampler {
         }
 
         await this._cleanActualBefore(yesterday.format('YYYY-MM-DD'));
-    }
-
-    async _cleanActualBefore(date) {
-        const actualCollection = this._db.collection('actual');
-
-        await actualCollection.deleteMany({
-            date: {
-                $lte: date,
-            },
-        });
     }
 }
 
