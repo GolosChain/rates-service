@@ -6,6 +6,8 @@ const { Moments, Logger } = core;
 
 const BasicService = core.service.Basic;
 
+const RECOVER_DAYS_BEFORE = 7;
+
 class DailySampler extends BasicService {
     async start() {
         await this.restore();
@@ -66,12 +68,12 @@ class DailySampler extends BasicService {
 
     async _tryRecover() {
         const yesterday = moment();
+
         yesterday.hour(12);
         yesterday.subtract(1, 'day');
 
-        for (let i = 6; i >= 0; --i) {
+        for (let i = RECOVER_DAYS_BEFORE; i >= 0; --i) {
             const day = moment(yesterday).subtract(i, 'day');
-
             const date = day.format('YYYY-MM-DD');
 
             const data = await Historical.findOne({

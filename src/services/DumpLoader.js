@@ -2,7 +2,6 @@ const core = require('gls-core-service');
 const { Historical } = require('../model');
 
 const { Logger } = core;
-
 const BasicService = core.service.Basic;
 
 class DumpLoader extends BasicService {
@@ -20,6 +19,8 @@ class DumpLoader extends BasicService {
 
             Logger.log('Historical data recovery complete');
         }
+
+        this.done();
     }
 }
 

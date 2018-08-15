@@ -4,7 +4,9 @@ const stats = core.Stats.client;
 const QuoteExtractor = require('../services/QuoteExtractor');
 const { Historical, Actual } = require('../model');
 
-class Api extends core.service.Basic {
+const { Basic } = core.service;
+
+class Api extends Basic {
     constructor(Gate) {
         super();
 
@@ -51,29 +53,13 @@ class Api extends core.service.Basic {
         const start = Date.now();
 
         let data = await Historical.findOne(
-            {
-                date: {
-                    $gte: date,
-                },
-            },
+            { date: { $gte: date } },
             { rates: 1 },
-            {
-                sort: {
-                    date: 1,
-                },
-            }
+            { sort: { date: 1 } }
         );
 
         if (!data) {
-            data = await Actual.findOne(
-                {},
-                { rates: 1 },
-                {
-                    sort: {
-                        stamp: -1,
-                    },
-                }
-            );
+            data = await Actual.findOne({}, { rates: 1 }, { sort: { stamp: -1 } });
         }
 
         stats.timing('rates_getHistorical', new Date() - start);
