@@ -1,17 +1,17 @@
 const core = require('gls-core-service');
 const errors = core.HttpError;
-const BasicService = core.service.Basic;
 const stats = core.Stats.client;
+const { Historical, Actual } = require('../model');
 
-class Api extends BasicService {
-    constructor(Gate, mongo) {
+class Api extends core.service.Basic {
+    constructor(Gate) {
         super();
 
-        this.mongo = mongo;
         this._gate = new Gate();
 
         this._getActual = this._getActual.bind(this);
         this._getHistorical = this._getHistorical.bind(this);
+        this._getHistoricalMulti = this._getHistoricalMulti.bind(this);
     }
 
     async start() {
@@ -33,15 +33,10 @@ class Api extends BasicService {
     async _getActual() {
         const start = Date.now();
 
-        const db = this.mongo.db;
-
-        const rates = db.collection('rates');
-        const historical = db.collection('historical');
-
-        let lastActual = await rates.findOne(
+        let lastActual = await Actual.findOne(
             {},
+            { rates: 1 },
             {
-                projection: { rates: 1 },
                 sort: {
                     stamp: -1,
                 },
@@ -49,10 +44,10 @@ class Api extends BasicService {
         );
 
         if (!lastActual) {
-            lastActual = await historical.findOne(
+            lastActual = await Historical.findOne(
                 {},
+                { rates: 1 },
                 {
-                    projection: { rates: 1 },
                     sort: {
                         date: -1,
                     },
@@ -74,18 +69,14 @@ class Api extends BasicService {
 
         const start = Date.now();
 
-        const db = this.mongo.db;
-
-        let data = await db.collection('historical').findOne(
+        let data = await Historical.findOne(
             {
                 date: {
                     $gte: date,
                 },
             },
+            { rates: 1 },
             {
-                projection: {
-                    rates: 1,
-                },
                 sort: {
                     date: 1,
                 },
@@ -93,12 +84,10 @@ class Api extends BasicService {
         );
 
         if (!data) {
-            data = await db.collection('actual').findOne(
+            data = await Actual.findOne(
                 {},
+                { rates: 1 },
                 {
-                    projection: {
-                        rates: 1,
-                    },
                     sort: {
                         stamp: -1,
                     },
@@ -114,9 +103,15 @@ class Api extends BasicService {
         };
     }
 
-    _getHistoricalMulti({ dates }) {
+    async _getHistoricalMulti({ dates }) {
+        const items = [];
+
+        for (let date of dates) {
+            items.push(await this._getHistorical({ date }));
+        }
+
         return {
-            items: dates.map(date => this._getHistorical({ date })),
+            items,
         };
     }
 }

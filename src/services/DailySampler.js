@@ -1,16 +1,12 @@
 const core = require('gls-core-service');
 const moment = require('moment-timezone');
+const { Historical, Actual } = require('../model');
 
 const { Moments, Logger } = core;
 
 const BasicService = core.service.Basic;
 
 class DailySampler extends BasicService {
-    constructor(mongo) {
-        super();
-        this.mongo = mongo;
-    }
-
     async start() {
         await this.restore();
 
@@ -44,21 +40,13 @@ class DailySampler extends BasicService {
     }
 
     async _makeSample(date) {
-        const db = this.mongo.db;
-
-        const actualCollection = db.collection('actual');
-        const historicalCollection = db.collection('historical');
-
-        const lastValue = await actualCollection.findOne(
-            { date },
-            { sort: { date: -1 }, projection: { rates: 1 } }
-        );
+        const lastValue = await Actual.findOne({ date }, { rates: 1 }, { sort: { date: -1 } });
 
         if (!lastValue) {
             return;
         }
 
-        historicalCollection.updateOne(
+        Historical.updateOne(
             {
                 date,
             },
@@ -76,19 +64,7 @@ class DailySampler extends BasicService {
         return true;
     }
 
-    async _cleanActualBefore(date) {
-        const actualCollection = this.mongo.db.collection('actual');
-
-        await actualCollection.deleteMany({
-            date: {
-                $lte: date,
-            },
-        });
-    }
-
     async _tryRecover() {
-        const db = this.mongo.db;
-
         const yesterday = moment();
         yesterday.hour(12);
         yesterday.subtract(1, 'day');
@@ -98,9 +74,7 @@ class DailySampler extends BasicService {
 
             const date = day.format('YYYY-MM-DD');
 
-            const historicalCollection = db.collection('historical');
-
-            const data = await historicalCollection.findOne({
+            const data = await Historical.findOne({
                 date,
             });
 
@@ -120,6 +94,14 @@ class DailySampler extends BasicService {
         }
 
         await this._cleanActualBefore(yesterday.format('YYYY-MM-DD'));
+    }
+
+    async _cleanActualBefore(date) {
+        await Actual.deleteMany({
+            date: {
+                $lte: date,
+            },
+        });
     }
 }
 
