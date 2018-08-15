@@ -1,6 +1,7 @@
 const core = require('gls-core-service');
 const errors = core.HttpError;
 const stats = core.Stats.client;
+const QuoteExtractor = require('../services/QuoteExtractor');
 const { Historical, Actual } = require('../model');
 
 class Api extends core.service.Basic {
@@ -33,32 +34,12 @@ class Api extends core.service.Basic {
     async _getActual() {
         const start = Date.now();
 
-        let lastActual = await Actual.findOne(
-            {},
-            { rates: 1 },
-            {
-                sort: {
-                    stamp: -1,
-                },
-            }
-        );
-
-        if (!lastActual) {
-            lastActual = await Historical.findOne(
-                {},
-                { rates: 1 },
-                {
-                    sort: {
-                        date: -1,
-                    },
-                }
-            );
-        }
+        const rates = await QuoteExtractor.getActualRates();
 
         stats.timing('rates_getActual', new Date() - start);
 
         return {
-            rates: lastActual.rates,
+            rates,
         };
     }
 
