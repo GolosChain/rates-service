@@ -1,6 +1,5 @@
 const core = require('gls-core-service');
 const moment = require('moment-timezone');
-const { getQuotes } = require('../utils/api');
 const env = require('../env');
 const { Actual, Historical } = require('../model');
 
@@ -43,6 +42,12 @@ class QuoteExtractor extends BasicService {
         return actualRates;
     }
 
+    constructor(coinApi) {
+        super();
+
+        this._coinApi = coinApi;
+    }
+
     async start() {
         this.startLoop(0, env.GLS_FETCH_INTERVAL * 1000);
     }
@@ -60,7 +65,7 @@ class QuoteExtractor extends BasicService {
     }
 
     async _parse() {
-        const result = await getQuotes(CURRENCIES);
+        const result = await this._coinApi.getQuotes(CURRENCIES);
 
         const now = new Date();
         const date = moment(now).format('YYYY-MM-DD');

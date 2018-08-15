@@ -8,6 +8,8 @@ services:
     - mongodb_vol:/data/db
     networks:
     - rates_services-tier
+    ports:
+    - 127.0.0.1:27017:27017
 
   node:
     container_name: rates_node
