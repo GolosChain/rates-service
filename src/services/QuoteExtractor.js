@@ -41,10 +41,10 @@ class QuoteExtractor extends BasicService {
     async _parse() {
         const db = this.mongo.db;
 
-        const data = await getQuotes();
+        const result = await getQuotes();
 
-        const gbgPrice = data.GBG.quote.USD.price;
-        const golosPrice = data.GOLOS.quote.USD.price;
+        const gbgPrice = result.data.GBG.quote.USD.price;
+        const golosPrice = result.data.GOLOS.quote.USD.price;
 
         const actualCollection = db.collection('actual');
 
