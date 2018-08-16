@@ -4,16 +4,29 @@ const env = require('../env');
 const { Actual, Historical } = require('../model');
 
 const { Logger } = core;
-
+const stats = core.Stats.client;
 const BasicService = core.service.Basic;
 
 const CURRENCIES = ['USD', 'EUR', 'RUB'];
 
-let actualRates = null;
-
 class QuoteExtractor extends BasicService {
-    static async getActualRates() {
-        if (!actualRates) {
+    constructor(coinApi) {
+        super();
+
+        this._coinApi = coinApi;
+        this._actualRates = null;
+    }
+
+    async start() {
+        this.startLoop(0, env.GLS_FETCH_INTERVAL * 1000);
+    }
+
+    async iteration() {
+        await this._safeRun();
+    }
+
+    async getActualRates() {
+        if (!this._actualRates) {
             let actual = await Actual.findOne(
                 {},
                 { rates: 1 },
@@ -36,35 +49,22 @@ class QuoteExtractor extends BasicService {
                 );
             }
 
-            actualRates = actual.rates;
+            this._actualRates = actual.rates;
         }
 
-        return actualRates;
+        return this._actualRates;
     }
 
-    constructor(coinApi) {
-        super();
-
-        this._coinApi = coinApi;
-    }
-
-    async start() {
-        this.startLoop(0, env.GLS_FETCH_INTERVAL * 1000);
-    }
-
-    async iteration() {
-        await this._safeParse();
-    }
-
-    async _safeParse() {
+    async _safeRun() {
         try {
-            await this._parse();
+            await this._run();
         } catch (err) {
-            Logger.error('Safe parse error:', err);
+            Logger.error('Safe extract failed:', err);
+            stats.increment('rates_quote_extract_error');
         }
     }
 
-    async _parse() {
+    async _run() {
         const result = await this._coinApi.getQuotes(CURRENCIES);
 
         const now = new Date();
@@ -83,7 +83,7 @@ class QuoteExtractor extends BasicService {
 
         await newEntry.save();
 
-        actualRates = rates;
+        this._actualRates = rates;
     }
 }
 

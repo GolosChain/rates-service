@@ -24,6 +24,7 @@ class DailySampler extends BasicService {
 
     async restore() {
         this._tryRecover().catch(err => {
+            stats.increment('daily_sampler_recover_error');
             Logger.error('Recovery failed', err);
         });
     }

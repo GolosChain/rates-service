@@ -15,11 +15,14 @@ module.exports = MongoDB.makeModel(
     },
     {
         index: [
+            // Индекс для выборки (+ уникальность записей)
             {
                 fields: {
                     date: -1,
                 },
-                unique: true,
+                options: {
+                    unique: true,
+                },
             },
         ],
     }

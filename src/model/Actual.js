@@ -19,11 +19,13 @@ module.exports = MongoDB.makeModel(
     },
     {
         index: [
+            // Индекс для выборки при удалении старых дат
             {
                 fields: {
                     date: 1,
                 },
             },
+            // Индекс для выборки последней записи
             {
                 fields: {
                     stamp: -1,

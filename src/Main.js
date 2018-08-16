@@ -3,7 +3,7 @@ const env = require('./env');
 const DumpLoader = require('./services/DumpLoader');
 const QuoteExtractor = require('./services/QuoteExtractor');
 const DailySampler = require('./services/DailySampler');
-const Api = require('./services/Api');
+const GateService = require('./services/Gate');
 const CoinMarketApi = require('./helpers/CoinMarketApi');
 
 const stats = core.Stats.client;
@@ -15,13 +15,13 @@ class Main extends Basic {
 
         const mongo = new MongoDB();
         const dumpLoader = new DumpLoader();
-        const api = new Api(Gate);
         const coinApi = new CoinMarketApi();
         const quoteExtractor = new QuoteExtractor(coinApi);
+        const gate = new GateService(Gate, quoteExtractor);
         const dailySampler = new DailySampler();
 
         this.printEnvBasedConfig(env);
-        this.addNested(mongo, dumpLoader, api, quoteExtractor, dailySampler);
+        this.addNested(mongo, dumpLoader, gate, quoteExtractor, dailySampler);
         this.stopOnExit();
     }
 

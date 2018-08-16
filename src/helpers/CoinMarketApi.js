@@ -23,15 +23,11 @@ class CoinMarketApi {
                 gzip: true,
             });
         } catch (err) {
-            if (err) {
-                throw {
-                    name: err.name,
-                    statusCode: err.statusCode,
-                    message: err.message,
-                };
-            } else {
-                throw err;
-            }
+            throw {
+                name: err.name,
+                statusCode: err.statusCode,
+                message: err.message,
+            };
         }
     }
 }

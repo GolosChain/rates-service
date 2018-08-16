@@ -1,16 +1,16 @@
 const core = require('gls-core-service');
 const errors = core.HttpError;
 const stats = core.Stats.client;
-const QuoteExtractor = require('../services/QuoteExtractor');
 const { Historical, Actual } = require('../model');
 
 const { Basic } = core.service;
 
-class Api extends Basic {
-    constructor(Gate) {
+class Gate extends Basic {
+    constructor(Gate, quoteExtractor) {
         super();
 
         this._gate = new Gate();
+        this._quoteExtractor = quoteExtractor;
 
         this._getActual = this._getActual.bind(this);
         this._getHistorical = this._getHistorical.bind(this);
@@ -36,7 +36,7 @@ class Api extends Basic {
     async _getActual() {
         const start = Date.now();
 
-        const rates = await QuoteExtractor.getActualRates();
+        const rates = await this._quoteExtractor.getActualRates();
 
         stats.timing('rates_getActual', new Date() - start);
 
@@ -89,4 +89,4 @@ class Api extends Basic {
     }
 }
 
-module.exports = Api;
+module.exports = Gate;
