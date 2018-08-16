@@ -38,7 +38,7 @@ class Gate extends Basic {
 
         const rates = await this._quoteExtractor.getActualRates();
 
-        stats.timing('rates_getActual', new Date() - start);
+        stats.timing('rates_get_actual', new Date() - start);
 
         return {
             rates,
@@ -63,7 +63,7 @@ class Gate extends Basic {
         }
 
         if (!disableLogging) {
-            stats.timing('rates_getHistorical', new Date() - start);
+            stats.timing('rates_get_historical', new Date() - start);
         }
 
         return {
@@ -81,7 +81,7 @@ class Gate extends Basic {
             items.push(await this._getHistorical({ date }, true));
         }
 
-        stats.timing('rates_getHistoricalMulti', new Date() - start);
+        stats.timing('rates_get_historical_multi', new Date() - start);
 
         return {
             items,
