@@ -45,7 +45,7 @@ class Api extends Basic {
         };
     }
 
-    async _getHistorical({ date }) {
+    async _getHistorical({ date }, disableLogging) {
         if (!date) {
             throw errors.E400.error;
         }
@@ -62,7 +62,9 @@ class Api extends Basic {
             data = await Actual.findOne({}, { rates: 1 }, { sort: { stamp: -1 } });
         }
 
-        stats.timing('rates_getHistorical', new Date() - start);
+        if (!disableLogging) {
+            stats.timing('rates_getHistorical', new Date() - start);
+        }
 
         return {
             date,
@@ -73,9 +75,13 @@ class Api extends Basic {
     async _getHistoricalMulti({ dates }) {
         const items = [];
 
+        const start = Date.now();
+
         for (let date of dates) {
-            items.push(await this._getHistorical({ date }));
+            items.push(await this._getHistorical({ date }, true));
         }
+
+        stats.timing('rates_getHistoricalMulti', new Date() - start);
 
         return {
             items,

@@ -3,7 +3,7 @@ const moment = require('moment-timezone');
 const { Historical, Actual } = require('../model');
 
 const { Moments, Logger } = core;
-
+const stats = core.Stats.client;
 const BasicService = core.service.Basic;
 
 const RECOVER_DAYS_BEFORE = 7;
@@ -48,19 +48,15 @@ class DailySampler extends BasicService {
             return;
         }
 
-        Historical.updateOne(
-            {
-                date,
-            },
+        await Historical.updateOne(
+            { date },
             {
                 $set: {
                     date,
                     rates: lastValue.rates,
                 },
             },
-            {
-                upsert: true,
-            }
+            { upsert: true }
         );
 
         return true;
@@ -71,6 +67,8 @@ class DailySampler extends BasicService {
 
         yesterday.hour(12);
         yesterday.subtract(1, 'day');
+
+        let countOfMissed = 0;
 
         for (let i = RECOVER_DAYS_BEFORE; i >= 0; --i) {
             const day = moment(yesterday).subtract(i, 'day');
@@ -86,14 +84,17 @@ class DailySampler extends BasicService {
                 try {
                     ok = await this._makeSample(date);
                 } catch (err) {
-                    console.error('Recovery failed', err);
+                    console.error('Recovery failed', date, err);
                 }
 
                 if (!ok) {
+                    countOfMissed++;
                     console.error('Missed rates for:', date);
                 }
             }
         }
+
+        stats.gauge('missed_dates', countOfMissed);
 
         await this._cleanActualBefore(yesterday.format('YYYY-MM-DD'));
     }
