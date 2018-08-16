@@ -6,20 +6,19 @@ const { Moments, Logger } = core;
 const stats = core.Stats.client;
 const BasicService = core.service.Basic;
 
+const OFFSET_OF_RUN = 30; // seconds
 const RECOVER_DAYS_BEFORE = 7;
 
 class DailySampler extends BasicService {
     async start() {
         await this.restore();
 
-        const newDay = moment.tz('UTC');
-        newDay.hour(0);
-        newDay.minute(0);
-        newDay.second(0);
-        newDay.millisecond(0);
-        newDay.add(1, 'day');
+        const nextDay = moment
+            .tz('UTC')
+            .endOf('day')
+            .add(OFFSET_OF_RUN, 'seconds');
 
-        this.startLoop(newDay - Date.now() + 30000, Moments.oneDay);
+        this.startLoop(nextDay - Date.now(), Moments.oneDay);
     }
 
     async restore() {
