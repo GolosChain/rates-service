@@ -1,6 +1,6 @@
 const core = require('gls-core-service');
 const moment = require('moment-timezone');
-const { injectGolosGBGRate } = require('../helpers/utils');
+const Utils = require('../helpers/utils');
 const env = require('../env');
 const { Actual, Historical } = require('../model');
 
@@ -50,7 +50,7 @@ class QuoteExtractor extends BasicService {
                 );
             }
 
-            this._actualRates = injectGolosGBGRate(actual.rates);
+            this._actualRates = Utils.injectGolosGBGRate(actual.rates);
         }
 
         return this._actualRates;
@@ -84,7 +84,7 @@ class QuoteExtractor extends BasicService {
 
         await newEntry.save();
 
-        this._actualRates = injectGolosGBGRate(rates);
+        this._actualRates = Utils.injectGolosGBGRate(rates);
     }
 
     _extractQuote(quotes) {

@@ -2,7 +2,7 @@ const core = require('gls-core-service');
 const errors = core.HttpError;
 const stats = core.Stats.client;
 const { Historical, Actual } = require('../model');
-const { injectGolosGBGRate } = require('../helpers/utils');
+const Utils = require('../helpers/utils');
 
 const { Basic } = core.service;
 
@@ -69,7 +69,7 @@ class Gate extends Basic {
 
         return {
             date,
-            rates: injectGolosGBGRate(data.rates),
+            rates: Utils.injectGolosGBGRate(data.rates),
         };
     }
 
