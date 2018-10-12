@@ -49,7 +49,7 @@ class QuoteExtractor extends BasicService {
                 );
             }
 
-            this._actualRates = actual.rates;
+            this._actualRates = injectGolosGBGRate(actual.rates);
         }
 
         return this._actualRates;
@@ -83,7 +83,7 @@ class QuoteExtractor extends BasicService {
 
         await newEntry.save();
 
-        this._actualRates = rates;
+        this._actualRates = injectGolosGBGRate(rates);
     }
 }
 
@@ -93,6 +93,13 @@ function extractQuote(quotes) {
         EUR: quotes.EUR.price,
         RUB: quotes.RUB.price,
     };
+}
+
+export function injectGolosGBGRate(quotes) {
+    quotes.GBG.GOLOS = quotes.GBG.USD / quotes.GOLOS.USD;
+    quotes.GOLOS.GBG = 1 / quotes.GBG.GOLOS;
+
+    return quotes;
 }
 
 module.exports = QuoteExtractor;
