@@ -37,6 +37,7 @@ class DailySampler extends BasicService {
             await this._makeSample(date);
             await this._cleanActualBefore(date);
         } catch (err) {
+            stats.increment('daily_sampler_iteration_error');
             Logger.error('DailySampler failed:', err);
         }
     }
