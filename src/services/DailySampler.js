@@ -37,7 +37,8 @@ class DailySampler extends BasicService {
             await this._makeSample(date);
             await this._cleanActualBefore(date);
         } catch (err) {
-            console.error('DailySampler failed:', err);
+            stats.increment('daily_sampler_iteration_error');
+            Logger.error('DailySampler failed:', err);
         }
     }
 
@@ -45,7 +46,7 @@ class DailySampler extends BasicService {
         const lastValue = await Actual.findOne({ date }, { rates: 1 }, { sort: { date: -1 } });
 
         if (!lastValue) {
-            return;
+            throw new Error(`Last record in actual not found for ${date}`);
         }
 
         await Historical.updateOne(
@@ -58,6 +59,8 @@ class DailySampler extends BasicService {
             },
             { upsert: true }
         );
+
+        Logger.info(`Historical record added for date ${date}`);
 
         return true;
     }
@@ -84,12 +87,12 @@ class DailySampler extends BasicService {
                 try {
                     ok = await this._makeSample(date);
                 } catch (err) {
-                    console.error('Recovery failed', date, err);
+                    Logger.error('Recovery failed', date, err);
                 }
 
                 if (!ok) {
                     countOfMissed++;
-                    console.error('Missed rates for:', date);
+                    Logger.error('Missed rates for:', date);
                 }
             }
         }
