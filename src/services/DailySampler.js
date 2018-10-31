@@ -31,7 +31,10 @@ class DailySampler extends BasicService {
     async iteration() {
         Logger.info('DailySampler iteration started');
 
-        const date = moment.tz('UTC').format('YYYY-MM-DD');
+        const date = moment
+            .tz('UTC')
+            .subtract(1, 'day')
+            .format('YYYY-MM-DD');
 
         try {
             await this._makeSample(date);

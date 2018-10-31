@@ -64,7 +64,7 @@ async function run() {
 
     await fs.writeFile(
         path.join(__dirname, '../data/historical-data.json'),
-        JSON.stringify(list, null, 2)
+        JSON.stringify(list, null, 2) + '\n'
     );
 }
 

@@ -2,8 +2,8 @@ const path = require('path');
 const fs = require('fs-extra');
 const moment = require('moment');
 
-async function run() {
-    const content = await fs.readFile(path.join(__dirname, './data_USD-EUR.txt'), 'utf-8');
+async function run(from, to) {
+    const content = await fs.readFile(path.join(__dirname, `./${from}`), 'utf-8');
 
     const lines = content.split('\n');
 
@@ -23,9 +23,13 @@ async function run() {
         data[date] = parseFloat(valueCol.replace(',', '.'));
     }
 
-    await fs.writeFile(path.join(__dirname, 'usd-eur.json'), JSON.stringify(data, null, 2));
+    await fs.writeFile(path.join(__dirname, to), JSON.stringify(data, null, 2));
 }
 
-run().catch(err => {
+run('data_USD-EUR.txt', 'usd-eur.json').catch(err => {
+    console.error(err);
+});
+
+run('data_USD-RUB.txt', 'usd-rub.json').catch(err => {
     console.error(err);
 });
