@@ -2,6 +2,7 @@ node_modules
 
 /config/local.json
 /temp/
+scripts/*.json
 .env
 
 .idea
